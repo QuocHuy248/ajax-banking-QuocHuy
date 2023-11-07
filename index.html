@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>List of customers</title>
+        <link
+            rel="stylesheet"
+            href="/assets/bootstrap/v5.3.2/css/bootstrap.min.css"
+        />
+        <link
+            rel="stylesheet"
+            href="https://use.fontawesome.com/releases/v5.15.3/css/all.css"
+        />
+        <link rel="stylesheet" href="/assets/css/custom-style.css" />
+        <link rel="stylesheet" href="/assets/css/loading.css" />
+        <script src="/assets/jquery/jquery-3.7.1.min.js"></script>
+        <script src="/assets/jquery/jquery.validate.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    </head>
+
+    <body>
+        <div class="container">
+            <header>
+                <nav class="navbar bg-body-tertiary">
+                    <div class="container-fluid">
+                        <a class="navbar-brand">List of customers</a>
+                        <div class="d-flex" style="gap: 10px">
+                            <button class="btn btn-outline-light" type="button">
+                                <i class="fas fa-history"></i>
+                                Transfer histories
+                            </button>
+                            <button
+                                type="button"
+                                class="btn btn-outline-light"
+                                data-bs-toggle="modal"
+                                data-bs-target="#modalCreate"
+                            >
+                                <i class="far fa-plus-square"></i>
+                                Add new customer
+                            </button>
+                        </div>
+                    </div>
+                </nav>
+            </header>
+
+            <div class="content">
+                <table id="tbCustomer" class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>FullName</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Address</th>
+                            <th>Balance</th>
+                            <th colspan="5">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="loading" class="sk-chase hide">
+            <div class="sk-chase-dot"></div>
+            <div class="sk-chase-dot"></div>
+            <div class="sk-chase-dot"></div>
+            <div class="sk-chase-dot"></div>
+            <div class="sk-chase-dot"></div>
+            <div class="sk-chase-dot"></div>
+        </div>
+
+        <div class="toast-container position-fixed bottom-0 end-0 p-3">
+            <div
+                id="liveToast"
+                class="toast align-items-center text-bg-primary border-0"
+                role="alert"
+                aria-live="assertive"
+                aria-atomic="true"
+            >
+                <div class="d-flex">
+                    <div id="toast-body" class="toast-body"></div>
+                    <button
+                        type="button"
+                        id="btnCloseToast"
+                        class="btn-close btn-close-white me-2 m-auto"
+                        data-bs-dismiss="toast"
+                        aria-label="Close"
+                    ></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Create -->
+        <div
+            class="modal fade"
+            id="modalCreate"
+            tabindex="-1"
+            aria-hidden="true"
+        >
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5">Modal create</h1>
+                        <button
+                            type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"
+                        ></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="frmCreate" method="post">
+                            <div class="row mb-3 mt-3">
+                                <div class="col-lg-6">
+                                    <label for="fullNameCre" class="form-label"
+                                        >Full Name</label
+                                    >
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        id="fullNameCre"
+                                        name="fullNameCre"
+                                    />
+                                </div>
+                                <div class="col-lg-6">
+                                    <label for="emailCre" class="form-label"
+                                        >Email</label
+                                    >
+                                    <input
+                                        type="email"
+                                        class="form-control"
+                                        id="emailCre"
+                                    />
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-lg-6">
+                                    <label for="phoneCre" class="form-label"
+                                        >Phone</label
+                                    >
+                                    <input
+                                        type="tel"
+                                        class="form-control"
+                                        id="phoneCre"
+                                    />
+                                </div>
+                                <div class="col-lg-6">
+                                    <label for="addressCre" class="form-label"
+                                        >Address</label
+                                    >
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        id="addressCre"
+                                    />
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button
+                            type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal"
+                        >
+                            Close
+                        </button>
+                        <button
+                            type="submit"
+                            class="btn btn-outline-success"
+                            id="btnCreate"
+                        >
+                            <i class="fas fa-plus"></i>
+                            Create
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Update -->
+        <div
+            class="modal fade"
+            id="modalUpdate"
+            tabindex="-1"
+            aria-hidden="true"
+        >
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5">Modal update</h1>
+                        <button
+                            type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"
+                        ></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post" id="frmUpdate">
+                            <div class="row mb-3 mt-3">
+                                <div class="col-lg-6">
+                                    <label for="fullNameUp" class="form-label"
+                                        >Full Name</label
+                                    >
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        id="fullNameUp"
+                                    />
+                                </div>
+                                <div class="col-lg-6">
+                                    <label for="emailUp" class="form-label"
+                                        >Email</label
+                                    >
+                                    <input
+                                        type="email"
+                                        class="form-control"
+                                        id="emailUp"
+                                    />
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-lg-6">
+                                    <label for="phoneUp" class="form-label"
+                                        >Phone</label
+                                    >
+                                    <input
+                                        type="tel"
+                                        class="form-control"
+                                        id="phoneUp"
+                                    />
+                                </div>
+                                <div class="col-lg-6">
+                                    <label for="addressUp" class="form-label"
+                                        >Address</label
+                                    >
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        id="addressUp"
+                                    />
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button
+                            type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal"
+                        >
+                            Close
+                        </button>
+                        <button
+                            type="submit"
+                            class="btn btn-outline-secondary"
+                            id="btnUpdate"
+                        >
+                            <i class="fas fa-pencil"></i>Update
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div
+            class="modal fade"
+            id="modalDeposit"
+            tabindex="-1"
+            role="dialog"
+            aria-labelledby="exampleModalLabel"
+            aria-hidden="true"
+        >
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5">Modal deposit</h1>
+                        <button
+                            type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"
+                        ></button>
+                    </div>
+                    <!-- Modal Body -->
+                    <div class="modal-body">
+                        <form method="post" id="frmDeposit">
+                            <div class="row mb-3 mt-3">
+                                <div class="col-lg-6">
+                                    <label for="fullNameDe" class="form-label"
+                                        >Full Name</label
+                                    >
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        id="fullNameDe"
+                                        readonly
+                                    />
+                                </div>
+                                <div class="col-lg-6">
+                                    <label for="balanceDe" class="form-label"
+                                        >Balance</label
+                                    >
+                                    <input
+                                        type="number"
+                                        class="form-control"
+                                        id="balanceDe"
+                                        readonly
+                                    />
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-lg-6">
+                                    <label for="phoneDe" class="form-label"
+                                        >Phone</label
+                                    >
+                                    <input
+                                        type="tel"
+                                        class="form-control"
+                                        id="phoneDe"
+                                        readonly
+                                    />
+                                </div>
+                                <div class="col-lg-6">
+                                    <label for="amountDe" class="form-label"
+                                        >Transaction Amount</label
+                                    >
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        id="amountDe"
+                                    />
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <div class="row pt-3">
+                            <div class="col-lg-3">
+                                <button
+                                    type="button"
+                                    class="btn btn-outline-success"
+                                    id="btnDeposit"
+                                >
+                                    <i class="fas fa-plus"></i>Deposit
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div
+            class="modal fade"
+            id="modalWithdraw"
+            tabindex="-1"
+            role="dialog"
+            aria-labelledby="exampleModalLabel"
+            aria-hidden="true"
+        >
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5">Modal withdraw</h1>
+                        <button
+                            type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"
+                        ></button>
+                    </div>
+                    <!-- Modal Body -->
+                    <div class="modal-body">
+                        <form method="post" id="frmWithdraw">
+                            <div class="row mb-3 mt-3">
+                                <div class="col-lg-6">
+                                    <label for="fullNameWd" class="form-label"
+                                        >Full Name</label
+                                    >
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        id="fullNameWd"
+                                        readonly
+                                    />
+                                </div>
+                                <div class="col-lg-6">
+                                    <label for="balanceWd" class="form-label"
+                                        >Balance</label
+                                    >
+                                    <input
+                                        type="number"
+                                        class="form-control"
+                                        id="balanceWd"
+                                        readonly
+                                    />
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-lg-6">
+                                    <label for="phoneWd" class="form-label"
+                                        >Phone</label
+                                    >
+                                    <input
+                                        type="tel"
+                                        class="form-control"
+                                        id="phoneWd"
+                                        readonly
+                                    />
+                                </div>
+                                <div class="col-lg-6">
+                                    <label for="amountWd" class="form-label"
+                                        >Transaction Amount</label
+                                    >
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        id="amountWd"
+                                    />
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <div class="row pt-3">
+                            <div class="col-lg-3">
+                                <button
+                                    type="button"
+                                    class="btn btn-outline-warning"
+                                    id="btnWithdraw"
+                                >
+                                    <i class="fas fa-minus"></i>Withdraw
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            // const bodyCustomer = document.querySelector('#tbCustomer tbody')
+            // const btnCreate = document.getElementById('btnCreate');
+            // const btnUpdate = document.getElementById('btnUpdate');
+            const bodyCustomer = $("#tbCustomer tbody");
+            const btnCreate = $("#btnCreate");
+            const btnUpdate = $("#btnUpdate");
+            const loading = $("#loading");
+            const btnDeposit = $("#btnDeposit");
+            const btnWithdraw = $("#btnWithdraw");
+
+            // const toastLive = document.getElementById('liveToast')
+            // const toastBody = document.getElementById('toast-body')
+            // const btnCloseToast = document.getElementById('btnCloseToast')
+            const toastLive = $("#liveToast");
+            const toastBody = $("#toast-body");
+            const btnCloseToast = $("#btnCloseToast");
+
+            const toastBootstrap =
+                bootstrap.Toast.getOrCreateInstance(toastLive);
+
+            let personId = 0;
+
+            async function fetchALlPerson() {
+                return await $.ajax({
+                    url: "http://localhost:3300/persons",
+                });
+            }
+            const resetButton = () => {
+                const btnEditElems = $(".edit");
+                const btnDepositElems = $(".deposit");
+                const btnWithdrawElems = $(".withdraw");
+                const btnTransferElems = $(".transfer");
+                btnEditElems.off("click");
+                btnDepositElems.off("click");
+                btnWithdrawElems.off("click");
+                btnTransferElems.off("click");
+            };
+
+            const renderButton = () => {
+                const btnEditElems = $(".edit");
+
+                $(".edit").on("click", async function () {
+                    personId = $(this).attr("data-id");
+                    const person = await getCustomer(personId);
+
+                    $("#modalUpdate").modal("show");
+                    $("#fullNameUp").val(person.fullName);
+                    $("#emailUp").val(person.email);
+                    $("#phoneUp").val(person.phone);
+                    $("#addressUp").val(person.address);
+                });
+
+                const btnDepositElems = $(".deposit");
+
+                $.each(btnDepositElems, (index, item) => {
+                    $(item).on("click", async () => {
+                        personId = $(item).data("id");
+                        const person = await getCustomer(personId);
+
+                        $("#modalDeposit").modal("show");
+                        $("#fullNameDe").val(person.fullName);
+                        $("#balanceDe").val(person.balance);
+                        $("#phoneDe").val(person.phone);
+                    });
+                });
+                const btnWithdrawElems = $(".withdraw");
+
+                $.each(btnWithdrawElems, (index, item) => {
+                    $(item).on("click", async () => {
+                        personId = $(item).data("id");
+                        const person = await getCustomer(personId);
+                        $("#modalWithdraw").modal("show");
+                        $("#fullNameWd").val(person.fullName);
+                        $("#balanceWd").val(person.balance);
+                        $("#phoneWd").val(person.phone);
+                    });
+                });
+            };
+            const getALlPerson = async () => {
+                const persons = await fetchALlPerson();
+
+                persons.forEach((item) => {
+                    const str = renderPerson(item);
+                    // bodyCustomer.innerHTML += str;
+                    bodyCustomer.prepend(str);
+                });
+                renderButton();
+            };
+
+            const getCustomer = async (personId) => {
+                const response = await $.ajax({
+                    url: "http://localhost:3300/persons/" + personId,
+                    dataType: "json",
+                });
+                return response;
+            };
+
+            const fetchUpdatePerson = async (personId, obj) => {
+                const response = await fetch(
+                    "http://localhost:3300/persons/" + personId,
+                    {
+                        method: "PATCH",
+                        headers: {
+                            "Content-type": "application/json; charset=UTF-8",
+                        },
+                        body: JSON.stringify(obj),
+                    }
+                );
+                const person = await response.json();
+                return person;
+            };
+
+            const renderPerson = (obj) => {
+                return `
+                           <tr id="tr_${obj.id}">
+                               <td>${obj.id}</td>
+                               <td>${obj.fullName}</td>
+                               <td>${obj.email}</td>
+                               <td>${obj.phone}</td>
+                               <td>${obj.address}</td>
+                               <td>${obj.balance}</td>
+                               <td>
+                                   <button class="btn btn-outline-secondary edit" id="data_${obj.id}" data-id="${obj.id}">
+                                       <i class="far fa-edit"></i>
+                                   </button>
+                               </td>
+                               <td>
+                                   <button class="btn btn-outline-success deposit" data-id="${obj.id}">
+                                       <i class="fas fa-plus"></i>
+                                   </button>
+                               </td>
+                               <td>
+                                   <button class="btn btn-outline-warning withdraw" data-id="${obj.id}">
+                                       <i class="fas fa-minus"></i>
+                                   </button>
+                               </td>
+                               <td>
+                                   <button class="btn btn-outline-primary">
+                                       <i class="fas fa-exchange-alt"></i>
+                                   </button>
+                               </td>
+                               <td>
+                                   <button class="btn btn-outline-danger">
+                                       <i class="fas fa-ban"></i>
+                                   </button>
+                               </td>
+                           </tr>
+                       `;
+            };
+
+            $("#modalCreate").on("hidden.bs.modal", () => {
+                $("#frmCreate").trigger("reset");
+                $("#frmCreate input").removeClass("error");
+                $("#frmCreate label.error").remove();
+            });
+
+            $("#modalUpdate").on("hidden.bs.modal", () => {
+                $("#frmUpdate").trigger("reset");
+                $("#frmUpdate input").removeClass("error");
+                $("#frmUpdate label.error").remove();
+            });
+            $("#modalDeposit").on("hidden.bs.modal", () => {
+                $("#frmDeposit").trigger("reset");
+                $("#frmDeposit input").removeClass("error");
+                $("#frmDeposit label.error").remove();
+            });
+            $("#modalWithdraw").on("hidden.bs.modal", () => {
+                $("#frmWithdraw").trigger("reset");
+                $("#frmWithdraw input").removeClass("error");
+                $("#frmWithdraw label.error").remove();
+            });
+
+            $("#frmCreate").validate({
+                rules: {
+                    fullNameCre: {
+                        required: true,
+                    },
+                },
+                messages: {
+                    fullNameCre: {
+                        required: "FullName is required",
+                    },
+                },
+                submitHandler: () => {
+                    createCustomer();
+                },
+            });
+
+            $("#frmUpdate").validate({
+                rules: {
+                    fullNameUp: {
+                        required: true,
+                    },
+                },
+                messages: {
+                    fullNameUp: {
+                        required: "FullName is required",
+                    },
+                },
+                submitHandler: () => {
+                    updateCustomer();
+                },
+            });
+            $("#frmDeposit").validate({
+                rules: {
+                    amountDe: {
+                        required: true,
+                    },
+                },
+                messages: {
+                    amountDe: {
+                        required: "Amount is required",
+                    },
+                },
+                submitHandler: () => {
+                    depositCustomer();
+                },
+            });
+            $("#frmWithdraw").validate({
+                rules: {
+                    amountDe: {
+                        required: true,
+                    },
+                },
+                messages: {
+                    amountDe: {
+                        required: "Amount is required",
+                    },
+                },
+                submitHandler: () => {
+                    withdrawCustomer();
+                },
+            });
+
+            const createCustomer = () => {
+                const fullName = $("#fullNameCre").val();
+                const email = $("#emailCre").val();
+                const phone = $("#phoneCre").val();
+                const address = $("#addressCre").val();
+                const balance = 0;
+                const deleted = 0;
+
+                const obj = {
+                    fullName,
+                    email,
+                    phone,
+                    address,
+                    balance,
+                    deleted,
+                };
+
+                btnCreate.prop("disabled", true);
+
+                loading.removeClass("hide");
+
+                setTimeout(() => {
+                    $.ajax({
+                        headers: {
+                            "Content-type": "application/json; charset=UTF-8",
+                        },
+                        method: "POST",
+                        url: "http://localhost:3300/persons",
+                        data: JSON.stringify(obj),
+                    })
+                        .done((data) => {
+                            const str = renderPerson(data);
+                            bodyCustomer.prepend(str);
+                            resetButton();
+                            renderButton();
+                            $("#modalCreate").modal("hide");
+                            toastBody.text("Thêm mới thành công");
+                            toastBootstrap.show();
+
+                            setTimeout(() => {
+                                btnCloseToast.click();
+                            }, 2000);
+                        })
+                        .always(() => {
+                            btnCreate.prop("disabled", false);
+                            loading.addClass("hide");
+                        });
+                }, 2000);
+            };
+            async function depositCustomer() {
+                const customerId = personId;
+                const amount = $("#amountDe").val();
+                const deleted = 0;
+                const now = new Date();
+                const datetime = `${now.getDate()}:${
+                    now.getMonth() + 1
+                }:${now.getFullYear()} ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
+                const deposit = {
+                    customerId,
+                    amount,
+                    deleted,
+                    datetime,
+                };
+                loading.removeClass("hide");
+
+                const personDe = await getCustomer(personId);
+                const balance = parseInt(amount) + personDe.balance;
+                const obj = {
+                    balance,
+                };
+                const person = await fetchUpdatePerson(personId, obj);
+                const updateRow = $("#tr_" + personId);
+                const str = renderPerson(person);
+                updateRow.replaceWith(str);
+                $.ajax({
+                    headers: {
+                        "Content-type": "application/json; charset=UTF-8",
+                    },
+                    method: "POST",
+                    url: "http://localhost:3300/deposits",
+                    data: JSON.stringify(deposit),
+                });
+                toastBody.text("Deposit successful");
+                resetButton();
+                renderButton();
+                setTimeout(() => {
+                    btnCloseToast.click();
+                    $("#modalDeposit").modal("hide");
+                    loading.addClass("hide");
+                    btnDeposit.prop("disabled", false);
+                }, 2000);
+                toastBootstrap.show();
+            }
+            async function withdrawCustomer() {
+                const customerId = personId;
+                const amount = $("#amountWd").val();
+                const deleted = 0;
+                const now = new Date();
+                const datetime = `${now.getDate()}:${
+                    now.getMonth() + 1
+                }:${now.getFullYear()} ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
+                const withdraw = {
+                    customerId,
+                    amount,
+                    deleted,
+                    datetime,
+                };
+                loading.removeClass("hide");
+
+                const personDe = await getCustomer(personId);
+                const balance = -parseInt(amount) + personDe.balance;
+                const obj = {
+                    balance,
+                };
+                const person = await fetchUpdatePerson(personId, obj);
+                const updateRow = $("#tr_" + personId);
+                const str = renderPerson(person);
+                updateRow.replaceWith(str);
+                $.ajax({
+                    headers: {
+                        "Content-type": "application/json; charset=UTF-8",
+                    },
+                    method: "POST",
+                    url: "http://localhost:3300/withdraws",
+                    data: JSON.stringify(withdraw),
+                });
+                toastBody.text("Withdraw successful");
+                resetButton();
+                renderButton();
+                setTimeout(() => {
+                    btnCloseToast.click();
+                    $("#modalWithdraw").modal("hide");
+                    loading.addClass("hide");
+                    btnWithdraw.prop("disabled", false);
+                }, 2000);
+                toastBootstrap.show();
+            }
+
+            async function updateCustomer() {
+                // Get the values from the form fields
+                const fullName = $("#fullNameUp").val();
+                const email = $("#emailUp").val();
+                const phone = $("#phoneUp").val();
+                const address = $("#addressUp").val();
+
+                // Construct the object to be sent to the server
+                const obj = {
+                    fullName,
+                    email,
+                    phone,
+                    address,
+                };
+
+                // Disable the update button and show the loading spinner
+                btnUpdate.prop("disabled", true);
+                loading.removeClass("hide");
+
+                // Fetch the updated person object from the server
+                const person = await fetchUpdatePerson(personId, obj);
+
+                // Update the DOM with the updated person object
+                const updateRow = $("#tr_" + personId);
+                const str = renderPerson(person);
+                updateRow.replaceWith(str);
+
+                // Hide the modal
+
+                // Show a toast message
+                toastBody.text("Update successful");
+                toastBootstrap.show();
+
+                // Reset the form and render the buttons
+                resetButton();
+                renderButton();
+
+                // Close the toast message after 2 seconds
+                setTimeout(() => {
+                    btnCloseToast.click();
+                    btnUpdate.prop("disabled", false);
+                    $("#modalUpdate").modal("hide");
+                    loading.addClass("hide");
+                }, 2000);
+                // Enable the update button and hide the loading spinner
+            }
+            btnCreate.on("click", async () => {
+                $("#frmCreate").trigger("submit");
+            });
+            btnUpdate.on("click", async () => {
+                $("#frmUpdate").trigger("submit");
+            });
+            btnDeposit.on("click", async () => {
+                $("#frmDeposit").trigger("submit");
+            });
+            btnWithdraw.on("click", async () => {
+                $("#frmWithdraw").trigger("submit");
+            });
+
+            // btnUpdate.on("click", async () => {
+            //     const fullName = document.getElementById("fullNameUp").value;
+            //     const email = document.getElementById("emailUp").value;
+            //     const phone = document.getElementById("phoneUp").value;
+            //     const address = document.getElementById("addressUp").value;
+
+            //     const obj = {
+            //         fullName,
+            //         email,
+            //         phone,
+            //         address,
+            //     };
+
+            //     const content = await fetchUpdatePerson(personId, obj);
+
+            //     const updateRow = $("#tr_" + personId);
+            //     const str = renderPerson(content);
+            //     updateRow.replaceWith(str);
+
+            //     closeModal("modalUpdate");
+
+            //     toastBody.text("Cập nhật thông tin thành công");
+            //     toastBootstrap.show();
+
+            //     $.each(btnEditElems, (index, item) => {
+            //         $(item).on("click", async () => {
+            //             personId = $(item).data("id");
+
+            //             const person = await getPersonById(personId);
+
+            //             openModal("modalUpdate");
+
+            //             $("#fullNameUp").val(person.fullName);
+            //             $("#emailUp").val(person.email);
+            //             $("#phoneUp").val(person.phone);
+            //             $("#addressUp").val(person.address);
+            //         });
+            //     });
+
+            //     $.each(btnDepositElems, (index, item) => {
+            //         $(item).on("click", async () => {
+            //             personId = $(item).data("id");
+
+            //             const person = await getPersonById(personId);
+
+            //             // openModal('modalUpdate')
+
+            //             // $('#fullNameUp').val(person.fullName)
+            //             // $('#emailUp').val(person.email)
+            //             // $('#phoneUp').val(person.phone)
+            //             // $('#addressUp').val(person.address)
+            //         });
+            //     });
+
+            //     setTimeout(() => {
+            //         btnCloseToast.click();
+            //     }, 2500);
+            // });
+            getALlPerson();
+        </script>
+    </body>
+</html>
