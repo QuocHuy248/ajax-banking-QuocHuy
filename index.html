@@ -741,6 +741,7 @@
                     datetime,
                 };
                 loading.removeClass("hide");
+                btnDeposit.prop("disabled", true);
 
                 const personDe = await getCustomer(personId);
                 const balance = parseInt(amount) + personDe.balance;
@@ -791,6 +792,8 @@
                 const obj = {
                     balance,
                 };
+                btnWithdraw.prop("disabled", true);
+
                 const person = await fetchUpdatePerson(personId, obj);
                 const updateRow = $("#tr_" + personId);
                 const str = renderPerson(person);
